@@ -1,0 +1,70 @@
+Table dim_date {
+  date_sk      bigint [pk, note: 'Surrogate key']
+  date_value   date   [not null]
+  year         int
+  month        int
+  day          int
+  month_name   varchar
+}
+
+Table dim_customer {
+  customer_sk        bigint [pk, note: 'Surrogate key']
+  customer_id        varchar [not null]
+  customer_name      varchar
+  customer_email     varchar
+  customer_birthdate date
+  customer_gender    varchar
+  customer_city      varchar
+  customer_state     varchar
+}
+
+Table dim_product {
+  product_sk         bigint [pk, note: 'Surrogate key']
+  product_id         varchar [not null]
+  product_name       varchar
+  product_category   varchar
+  product_subcategory varchar
+  brand              varchar
+}
+
+Table dim_store {
+  store_sk    bigint [pk, note: 'Surrogate key']
+  store_id    varchar [not null]
+  store_name  varchar
+  store_city  varchar
+  store_state varchar
+}
+
+Table dim_payment {
+  payment_sk          bigint [pk, note: 'Surrogate key']
+  payment_method      varchar
+  payment_installments int
+  payment_status      varchar
+}
+
+Table fact_order_items {
+  order_id        varchar
+  order_item_id   int
+
+  order_date_sk   bigint [not null]
+  customer_sk     bigint [not null]
+  product_sk      bigint [not null]
+  store_sk        bigint [not null]
+  payment_sk      bigint [not null]
+
+  quantity        int
+  unit_price      decimal(10,2)
+  discount_value  decimal(10,2)
+  total_gross     decimal(10,2)
+  total_net       decimal(10,2)
+
+  Indexes {
+    (order_id, order_item_id) [name: 'idx_fact_order_pk_like']
+  }
+}
+
+Ref: fact_order_items.order_date_sk > dim_date.date_sk
+Ref: fact_order_items.customer_sk  > dim_customer.customer_sk
+Ref: fact_order_items.product_sk   > dim_product.product_sk
+Ref: fact_order_items.store_sk     > dim_store.store_sk
+Ref: fact_order_items.payment_sk   > dim_payment.payment_installments
